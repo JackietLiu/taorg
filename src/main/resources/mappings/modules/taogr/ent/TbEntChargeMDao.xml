@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.ent.TbEntChargeMDao">
+    
+	<sql id="tbEntChargeMColumns">
+		a.id AS "id",
+		a.ent_id AS "office.id",
+		a.fee AS "fee",
+		a.fee_total AS "feeTotal",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name as "office.name"
+	</sql>
+	
+	<sql id="tbEntChargeMJoins">
+	left join sys_office b on a.ent_id = b.id
+	</sql>
+    
+	<select id="get" resultType="TbEntChargeM">
+		SELECT 
+			<include refid="tbEntChargeMColumns"/>
+		FROM tb_ent_charge_m a
+		<include refid="tbEntChargeMJoins"/>
+		WHERE a.id = #{id} and a.del_flag = 0
+	</select>
+	
+	<select id="getByEneId" parameterType="String" resultType="TbEntChargeM">
+		SELECT 
+			<include refid="tbEntChargeMColumns"/>
+		FROM tb_ent_charge_m a
+		<include refid="tbEntChargeMJoins"/>
+		WHERE a.ent_id = #{entId}
+	</select>
+	
+	<select id="findList" resultType="TbEntChargeM">
+		SELECT 
+			<include refid="tbEntChargeMColumns"/>
+		FROM tb_ent_charge_m a
+		<include refid="tbEntChargeMJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.name !=null and office.name != ''">
+				AND b.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{office.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{office.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{office.name},'%')</if>
+			</if>
+			<if test="fee != null and fee != ''">
+				AND a.fee = #{fee}
+			</if>
+			<if test="feeTotal != null and feeTotal != ''">
+				AND a.fee_total = #{feeTotal}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbEntChargeM">
+		SELECT 
+			<include refid="tbEntChargeMColumns"/>
+		FROM tb_ent_charge_m a
+		<include refid="tbEntChargeMJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_ent_charge_m(
+			id,
+			ent_id,
+			fee,
+			fee_total,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{fee}*100,
+			#{feeTotal}*100,
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_ent_charge_m SET 	
+			ent_id = #{office.id},
+			fee = #{fee}*100,
+			fee_total = #{feeTotal}*100,
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_ent_charge_m SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateM" parameterType="TbEntChargeM">
+		UPDATE tb_ent_charge_m SET 	
+			ent_id = #{office.id},
+			fee = fee + #{DFee}*100 - #{oldDFee},
+			fee_total = fee_total + #{DFee}*100 - #{oldDFee},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateMFeeByEnt"  parameterType="TbEntChargeM">
+		UPDATE tb_ent_charge_m SET 	
+			fee = fee-#{fee},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE ent_id = #{office.id}
+	</update>
+	<update id="updateMAddFeeByEnt"  parameterType="TbEntChargeM">
+		UPDATE tb_ent_charge_m SET 	
+			fee = fee+#{fee},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate}
+		WHERE ent_id = #{office.id}
+	</update>
+	
+</mapper>

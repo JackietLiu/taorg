@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.ent.TbEnterpriseInfoDao">
+
+	<sql id="tbEnterpriseInfoColumns">
+		a.id AS "id",
+		a.ent_name AS "entName",
+		a.ent_no AS "entNo",
+		a.contact_name AS "contactName",
+		a.contact_title AS "contactTitle",
+		a.contact_tel AS "contactTel",
+		a.contact_mail AS "contactMail",
+		a.ent_rep AS "entRep",
+		a.ent_address AS "entAddress",
+		a.ent_mail AS
+		"entMail",
+		a.is_active AS "isActive",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS
+		"delFlag",
+		a.ent_type AS "entType",
+		a.reg_address AS "regAddress",
+		a.warn_tp AS "warnTp",
+		a.warn_value AS "warnValue",
+		a.parent_id AS
+		"parent.id",
+		a.parent_ids AS "parentIds",
+		b.fee as "fee" ,
+		b.fee_total as "feeTotal",
+		su.ent_id as "entId",
+		a.logo_path as "logoPath"
+	</sql>
+
+	<sql id="tbEnterpriseInfoJoins">
+		left join tb_ent_charge_m b on a.id = b.ent_id
+        left join sys_user su on su.ent_id=a.id
+	</sql>
+
+	<select id="get" resultType="TbEnterpriseInfo">
+		SELECT
+		<include refid="tbEnterpriseInfoColumns" />
+		FROM tb_enterprise_info a
+		<include refid="tbEnterpriseInfoJoins" />
+		WHERE a.id = #{id}
+		 GROUP BY a.id
+	</select>
+
+	<select id="findList" resultType="TbEnterpriseInfo">
+		SELECT
+		<include refid="tbEnterpriseInfoColumns" />
+		FROM tb_enterprise_info a
+		<include refid="tbEnterpriseInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="entName != null and entName != ''">
+				AND a.ent_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{entName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{entName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{entName},'%')</if>
+			</if>
+			<if test="entNo != null and entNo != ''">
+				AND a.ent_no LIKE
+				<if test="dbName == 'oracle'">'%'||#{entNo}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{entNo}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{entNo},'%')</if>
+			</if>
+			<if test="contactName != null and contactName != ''">
+				AND a.contact_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{contactName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{contactName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{contactName},'%')</if>
+			</if>
+			<if test="contactTel != null and contactTel != ''">
+				AND a.contact_tel LIKE
+				<if test="dbName == 'oracle'">'%'||#{contactTel}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{contactTel}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{contactTel},'%')</if>
+			</if>
+			<if test="contactMail != null and contactMail != ''">
+				AND a.contact_mail LIKE
+				<if test="dbName == 'oracle'">'%'||#{contactMail}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{contactMail}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{contactMail},'%')</if>
+			</if>
+			<if test="entRep != null and entRep != ''">
+				AND a.ent_rep LIKE
+				<if test="dbName == 'oracle'">'%'||#{entRep}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{entRep}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{entRep},'%')</if>
+			</if>
+			<if test="isActive != null and isActive != ''">
+				AND a.is_active = #{isActive}
+			</if>
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE
+				<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+		</where>
+		GROUP BY a.id
+	</select>
+	<select id="findListByEntId" resultType="TbEnterpriseInfo">
+		SELECT
+		<include refid="tbEnterpriseInfoColumns" />
+		FROM tb_enterprise_info a
+		<include refid="tbEnterpriseInfoJoins" />
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL} 
+		AND su.ent_id = #{entId}
+		OR parent_id = #{entId}
+		OR parent_ids LIKE
+		<if test="dbName == 'oracle'">'%'||#{entId}||'%'</if>
+		<if test="dbName == 'mssql'">'%'+#{entId}+'%'</if>
+		<if test="dbName == 'mysql'">concat('%',#{entId},'%')</if>
+        GROUP BY a.id
+	</select>
+	<select id="findAllList" resultType="TbEnterpriseInfo">
+		SELECT
+		<include refid="tbEnterpriseInfoColumns" />
+		FROM tb_enterprise_info a
+		<include refid="tbEnterpriseInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+
+	<select id="findByParentIdsLike" resultType="TbEnterpriseInfo">
+		SELECT
+		a.id,
+		a.parent_id AS "parent.id",
+		a.parent_ids
+		FROM tb_enterprise_info a
+		<include refid="tbEnterpriseInfoJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE
+			#{parentIds}
+		</where>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_enterprise_info(
+		id,
+		ent_name,
+		ent_no,
+		contact_name,
+		contact_title,
+		contact_tel,
+		contact_mail,
+		ent_rep,
+		ent_address,
+		ent_mail,
+		is_active,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag,
+		ent_type,
+		reg_address,
+		warn_tp,
+		warn_value,
+		nonum,
+		parent_id,
+		parent_ids,
+		logo_path
+		) VALUES (
+		#{id},
+		#{entName},
+		LPAD((IFNULL((select info.nonum from tb_enterprise_info info where info.del_flag = 0 order
+		by info.nonum desc limit 0,1),0)+1),6,"0") ,
+		#{contactName},
+		#{contactTitle},
+		#{contactTel},
+		#{contactMail},
+		#{entRep},
+		#{entAddress},
+		#{entMail},
+		#{isActive},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag},
+		#{entType},
+		#{regAddress},
+		#{warnTp},
+		#{warnValue},
+		IFNULL((select info.nonum from tb_enterprise_info info where info.del_flag = 0 order
+		by info.nonum desc limit 0,1),0)+1,
+		#{parent.id},
+		#{parentIds},
+		#{logoPath}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_enterprise_info SET
+		ent_name = #{entName},
+		ent_no = #{entNo},
+		contact_name = #{contactName},
+		contact_title = #{contactTitle},
+		contact_tel = #{contactTel},
+		contact_mail = #{contactMail},
+		ent_rep = #{entRep},
+		ent_address = #{entAddress},
+		ent_mail = #{entMail},
+		is_active = #{isActive},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks},
+		ent_type = #{entType},
+		reg_address = #{regAddress},
+		warn_tp = #{warnTp},
+		warn_value = #{warnValue}*100,
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds},
+		logo_path = #{logoPath}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateParentIds">
+		UPDATE tb_enterprise_info SET
+		parent_id = #{parent.id},
+		parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE tb_enterprise_info SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE
+		<if test="dbName == 'oracle'">'%'||#{id}||'%'</if>
+		<if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
+		<if test="dbName == 'mysql'">concat('%',#{id},'%')</if>
+	</update>
+
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.ent.TbEntChargeDDao">
+    
+	<sql id="tbEntChargeDColumns">
+		a.id AS "id",
+		a.ent_id AS "office.id",
+		a.fee AS "fee",
+		a.fee_total AS "feeTotal",
+		a.fee_certificate_no AS "feeCertificateNo",
+		a.fee_image AS "feeImage",
+		a.user_audit AS "userAudit.id",
+		a.dt_audit AS "dtAudit",
+		a.status_audit AS "statusAudit",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.name as "office.name",
+		c.name as "userAudit.name"
+	</sql>
+	
+	<sql id="tbEntChargeDJoins">
+	left join sys_office b on a.ent_id = b.id
+	left join sys_user c on c.id = a.user_audit
+	</sql>
+    
+	<select id="get" resultType="TbEntChargeD">
+		SELECT 
+			<include refid="tbEntChargeDColumns"/>
+		FROM tb_ent_charge_d a
+		<include refid="tbEntChargeDJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbEntChargeD">
+		SELECT 
+			<include refid="tbEntChargeDColumns"/>
+		FROM tb_ent_charge_d a
+		<include refid="tbEntChargeDJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="feeCertificateNo != null and feeCertificateNo != ''">
+				AND a.fee_certificate_no = #{feeCertificateNo}
+			</if>
+			<if test="userAudit != null and userAudit.id != null and userAudit.id != ''">
+				AND a.user_audit = #{userAudit.id}
+			</if>
+			<if test="dtAudit != null and dtAudit != ''">
+				AND a.dt_audit = #{dtAudit}
+			</if>
+			<if test="statusAudit != null and statusAudit != ''">
+				AND a.status_audit = #{statusAudit}
+			</if>
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.ent_id = #{office.id}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbEntChargeD">
+		SELECT 
+			<include refid="tbEntChargeDColumns"/>
+		FROM tb_ent_charge_d a
+		<include refid="tbEntChargeDJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_ent_charge_d(
+			id,
+			ent_id,
+			fee,
+			fee_total,
+			fee_certificate_no,
+			fee_image,
+			user_audit,
+			dt_audit,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{office.id},
+			#{fee}*100,
+			#{feeTotal},
+			#{feeCertificateNo},
+			#{feeImage},
+			#{userAudit.id},
+			#{dtAudit},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_ent_charge_d SET 	
+			ent_id = #{office.id},
+			fee = #{fee}*100,
+			fee_total = #{feeTotal},
+			fee_certificate_no = #{feeCertificateNo},
+			fee_image = #{feeImage},
+			user_audit = #{userAudit.id},
+			dt_audit = #{dtAudit},
+			status_audit = #{statusAudit},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_ent_charge_d SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="toUpdateStatus" parameterType="TbEntChargeD">
+		UPDATE tb_ent_charge_d SET 	
+			user_audit = #{userAudit.id},
+			dt_audit = #{dtAudit},
+			status_audit = #{statusAudit}
+		WHERE id = #{id}
+	</update>
+</mapper>

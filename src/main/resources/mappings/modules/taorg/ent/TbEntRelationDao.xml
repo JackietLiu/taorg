@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taorg.dao.ent.TbEntRelationDao">
+    
+	<sql id="tbEntRelationColumns">
+		a.id AS "id",
+		a.parent_id AS "parentId",
+		a.all_id AS "allId",
+		(select name from listtree v where v.id=a.parent_id) as "parentName" ,
+		(select name from listtree c  where c.id=a.all_id) as "allName",
+		a.type AS "type",
+		a.url AS "url"
+	
+			
+	</sql>
+	
+	<sql id="tbEntRelationJoins">
+	
+	</sql>
+    
+	<select id="get" resultType="TbEntRelation">
+		SELECT 
+			<include refid="tbEntRelationColumns"/>
+		FROM tb_ent_relation a
+		<include refid="tbEntRelationJoins"/>
+		WHERE id = #{id} 
+	</select>
+	
+	<select id="findList" resultType="TbEntRelation">
+		SELECT 
+			<include refid="tbEntRelationColumns"/>
+		FROM tb_ent_relation a
+		<include refid="tbEntRelationJoins"/>
+		<where>
+			
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parentId}
+			</if>
+			<if test="allId != null and allId != ''">
+				AND a.all_id = #{allId}
+			</if>
+			<if test="allName !='' and allName != null">
+		AND (select name from listtree c  where c.id=a.all_id) LIKE
+		            <if test="dbName == 'oracle'">'%'||#{allName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{allName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{allName},'%')</if>
+		</if>
+		</where>
+		group by a.parent_id,a.all_id
+	</select>
+	
+	<select id="findAllList" resultType="TbEntRelation">
+		SELECT 
+			<include refid="tbEntRelationColumns"/>
+		FROM tb_ent_relation a
+		<include refid="tbEntRelationJoins"/>
+		<where>
+			
+		</where>
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="TbEntRelation">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id"
+		FROM tb_ent_relation a
+		<include refid="tbEntRelationJoins"/>
+	</select>
+	<select id="findListForSearch" resultType="TbEntRelation">
+		SELECT
+			(select name from listtree c  where c.id=a.all_id)			
+		FROM tb_ent_relation a 
+		WHERE  AND #{allName} LIKE
+		            <if test="dbName == 'oracle'">'%'||#{allName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{allName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{allName},'%')</if>
+		<include refid="tbEntRelationJoins"/>
+	</select> 
+	<insert id="insert">	
+		 INSERT INTO tb_ent_relation(
+			id,
+			parent_id,
+			all_id,
+			type,
+			url
+		) VALUES (
+			#{id},
+			#{parentId},
+			#{allId},
+			#{type},
+			#{url}
+		) 
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_ent_relation SET 	
+			parent_id = #{parentId}
+			<!-- ,
+			all_id = #{allId} -->
+		WHERE id = #{id} 
+	</update>
+	
+<!-- 	<update id="updateParentIds">
+		UPDATE tb_ent_relation SET 
+			parent_id = #{parentId}
+		WHERE id = #{id} AND all_id = #{allId}
+	</update> -->
+	
+	<update id="delete">
+		DELETE FROM tb_ent_relation
+		WHERE id = #{id} or all_id=#{allId}
+		<!--  OR parent_ids LIKE
+		            <if test="dbName == 'oracle'">'%'||#{id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{id},'%')</if> -->
+	</update>
+	
+</mapper>

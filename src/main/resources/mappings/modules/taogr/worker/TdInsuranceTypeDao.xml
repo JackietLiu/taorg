@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.worker.TdInsuranceTypeDao">
+    
+	<sql id="tdInsuranceTypeColumns">
+		a.id AS "id",
+		a.ins_name AS "insName",
+		a.ins_name_abbr AS "insNameAbbr",
+		a.describe_type AS "describeType",
+		a.buy_memo AS "buyMemo",
+		a.fee_per AS "feePer",
+		a.is_active AS "isActive",
+		a.corp_name AS "corpName",
+		a.ins_no as "insNo"
+	</sql>
+	
+	<sql id="tdInsuranceTypeJoins">
+	</sql>
+    
+	<select id="get" resultType="TdInsuranceType">
+		SELECT 
+			<include refid="tdInsuranceTypeColumns"/>
+		FROM td_insurance_type a
+		<include refid="tdInsuranceTypeJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TdInsuranceType">
+		SELECT 
+			<include refid="tdInsuranceTypeColumns"/>
+		FROM td_insurance_type a
+		<include refid="tdInsuranceTypeJoins"/>
+		<where>
+			
+			<if test="insName != null and insName != ''">
+				AND a.ins_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{insName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{insName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{insName},'%')</if>
+			</if>
+			<if test="insNo != null and insNo != ''">
+				AND a.ins_no = #{insNo}
+			</if>
+			<if test="insNameAbbr != null and insNameAbbr != ''">
+				AND a.ins_name_abbr LIKE 
+					<if test="dbName == 'oracle'">'%'||#{insNameAbbr}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{insNameAbbr}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{insNameAbbr},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TdInsuranceType">
+		SELECT 
+			<include refid="tdInsuranceTypeColumns"/>
+		FROM td_insurance_type a
+		<include refid="tdInsuranceTypeJoins"/>
+		<where>
+			
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO td_insurance_type(
+			id,
+			ins_name,
+			ins_name_abbr,
+			describe_type,
+			buy_memo,
+			fee_per,
+			is_active,
+			corp_name,
+			ins_no ,
+			xznum
+		) VALUES (
+			#{id},
+			#{insName},
+			#{insNameAbbr},
+			#{describeType},
+			#{buyMemo},
+			#{feePer}*100,
+			#{isActive},
+			#{corpName},
+			LPAD((IFNULL((select t.xznum from td_insurance_type t  order by t.xznum desc limit 0,1),0)+1),5,"0") ,
+			IFNULL((select t.xznum from td_insurance_type t   order by t.xznum desc limit 0,1),0)+1
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE td_insurance_type SET 	
+			ins_name = #{insName},
+			ins_name_abbr = #{insNameAbbr},
+			describe_type = #{describeType},
+			buy_memo = #{buyMemo},
+			fee_per = #{feePer}*100,
+			is_active = #{isActive},
+			corp_name = #{corpName},
+			ins_no = #{insNo}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		DELETE FROM td_insurance_type
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findInsTypeByNo" resultType="TdInsuranceType" parameterType="String">
+		SELECT 
+			<include refid="tdInsuranceTypeColumns"/>
+		FROM td_insurance_type a
+		<include refid="tdInsuranceTypeJoins"/>
+		WHERE a.ins_no = #{insNo}
+	</select>
+	
+</mapper>

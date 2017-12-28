@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taorg.dao.worker.TbWorkerTeamDao">
+    
+	<sql id="tbWorkerTeamColumns">
+		a.id AS "id",
+		a.pro_id AS "projects.id",
+		a.team_name AS "teamName",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.pro_name AS "projects.proName"
+		
+	</sql>
+	
+	<sql id="tbWorkerTeamJoins">
+	left join tb_work_projects b on b.id=a.pro_id
+	</sql>
+    
+	<select id="get" resultType="TbWorkerTeam">
+		SELECT 
+			<include refid="tbWorkerTeamColumns"/>
+		FROM tb_worker_team a
+		<include refid="tbWorkerTeamJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbWorkerTeam">
+		SELECT 
+			<include refid="tbWorkerTeamColumns"/>
+		FROM tb_worker_team a
+		<include refid="tbWorkerTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbWorkerTeam">
+		SELECT 
+			<include refid="tbWorkerTeamColumns"/>
+		FROM tb_worker_team a
+		<include refid="tbWorkerTeamJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_worker_team(
+			id,
+			pro_id,
+			team_name,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{projects.id},
+			#{teamName},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_worker_team SET 	
+			pro_id = #{projects.id},
+			team_name = #{teamName},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_worker_team SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

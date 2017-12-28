@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taorg.dao.loginlog.TbLoginLogDao">
+
+	<sql id="tbLoginLogColumns">
+		a.id AS "id",
+		a.login_name AS "loginName",
+		a.times AS "times",
+		a.last_login_date AS "lastLoginDate",
+		a.ent_id AS "officeId",
+		a.user_id AS "userId",
+		a.ent_name AS "officeName",
+		a.login_ip AS "loginIp"
+	</sql>
+
+	<sql id="tbLoginLogJoins">
+	</sql>
+
+	<select id="get" resultType="TbLoginLog">
+		SELECT
+		<include refid="tbLoginLogColumns" />
+		FROM tb_login_log a
+		<include refid="tbLoginLogJoins" />
+		WHERE a.id = #{id}
+	</select>
+
+	<select id="findList" resultType="TbLoginLog">
+		SELECT
+		<include refid="tbLoginLogColumns" />
+		FROM tb_login_log a
+		<include refid="tbLoginLogJoins" />
+		<where>
+			<if test="officeName != null and officeName != ''">
+				AND a.ent_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{officeName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{officeName}+'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{officeName}, '%')</if>
+			</if>
+			<if test="loginIp != null and loginIp != ''">
+				AND a.login_ip LIKE
+				<if test="dbName == 'oracle'">'%'||#{loginIp}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{loginIp}+'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{loginIp}, '%')</if>
+			</if>
+			<if test="loginName != null and loginName != ''">
+				AND a.login_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{loginName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{loginName}+'%'</if>
+				<if test="dbName == 'mysql'">CONCAT('%', #{loginName}, '%')</if>
+			</if>
+		</where>
+		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbLoginLog">
+		SELECT
+		<include refid="tbLoginLogColumns" />
+		FROM tb_login_log a
+		<include refid="tbLoginLogJoins" />
+		<where>
+
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_login_log(
+		id,
+		login_name,
+		times,
+		last_login_date,
+		ent_id,
+		user_id,
+		ent_name,
+		login_ip
+		) VALUES (
+		#{id},
+		#{loginName},
+		#{times},
+		#{lastLoginDate},
+		#{officeId},
+		#{userId},
+		#{officeName},
+		#{loginIp}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_login_log SET
+		login_name = #{loginName},
+		times = #{times},
+		last_login_date = #{lastLoginDate},
+		ent_id = #{officeId},
+		user_id = #{userId},
+		ent_name = #{officeName}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		DELETE FROM tb_login_log
+		WHERE id = #{id}
+	</update>
+
+</mapper>

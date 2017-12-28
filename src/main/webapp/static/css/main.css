@@ -1,0 +1,359 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*main style -------------------------------------------------------------------------------*/
+.foot{
+    clear: both;
+    background: #333333;
+    margin-top: 40px;
+    color: #fff;
+    padding: 48px 0 32px;
+}
+.foot a{
+    color: #fff;
+}
+.foot a:hover{
+    color: #14b9f8;
+}
+.foot-inner{
+    width: 1000px;
+    margin: 0 auto;
+}
+.foot .nav{
+    margin: 0 3%;
+    overflow: hidden;
+}
+.foot .nav .box{
+    float: left;
+    width: 25%;
+}
+.foot .nav .box h3{
+    margin-left: 15%;
+    font-weight: normal;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+.foot .nav .box ul{
+    margin-left: 15%;
+}
+.foot .nav .box ul li{
+    margin-bottom: 15px;
+}
+.foot .copyright{
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+}
+
+/*home -------------------------------------------------------------------------------*/
+.body-home .head{
+    width: 100%;
+    height: 1000px;
+    background: url("../images/home-bg-top.jpg") no-repeat center;
+    background-size: cover;
+    color: #fff;
+}
+.body-home .head-inner{
+    -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box;
+    margin: 0 auto;
+    max-width: 1200px;
+    min-width: 970px;
+    padding: 0 15px;
+    height: 100%;
+    position: relative;
+}
+.body-home .head .mc-t{
+    position: absolute;
+    left: 15px;
+    right: 15px;
+    top: 0;
+    height: 120px;
+}
+.body-home .head .logo{
+    position: absolute;
+    left: 0;
+    top: 35px;
+}
+.body-home .head .select-city{
+    position: absolute;
+    left: 320px;
+    top: 95px;
+    width: 78px;
+    height: 34px;
+    border: 1px solid #fff;
+    overflow: hidden;
+}
+.body-home .head .select-city span{
+    display: block;
+    width: 56px;
+    height: 100%;
+    line-height: 32px;
+    margin-left: 10px;
+    background: url("../images/select-ar1.png") no-repeat right center;
+}
+.body-home .head .select-city select{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 32px;
+    opacity: 0;
+    cursor: pointer;
+}
+.body-home .head .menu{
+    position: absolute;
+    left: 280px;
+    top: 53px;
+    overflow: hidden;
+}
+.body-home .head .menu li{
+    float: left;
+    height: 32px;
+    line-height: 32px;
+}
+.body-home .head .menu a{
+    display: block;
+    padding: 0 13px;
+    color: #fff;
+    -webkit-transition:all 0.5s;
+    transition:all 0.5s;
+}
+.body-home .head .userinfo{
+    position: absolute;
+    right: 0;
+    top: 50px;
+}
+.body-home .head .userinfo a{
+    color: #fff;
+    margin-left: 15px;
+    display: inline-block;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 16px;
+    font-size: 16px;
+    border: 1px solid #fff;
+}
+.body-home .head .userinfo a:hover{
+    border-color: #14b9f8;
+}
+.body-home .head .userinfo .btn-reg{
+    border-color: #14b9f8;
+    background: #14b9f8;
+}
+.body-home .head .userinfo .btn-reg:hover{
+    border-color: #fff;
+}
+.body-home .head .menu a:hover{
+    color: #14b9f8;
+}
+.body-home .head .menu .on a{
+    color: #14b9f8;
+}
+.body-home .head .mc{
+    display: table;
+    width: 100%;
+    height: 100%;
+}
+.body-home .head .mc-inner{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+.body-home .head .mc .desc{
+    margin-top: -3%;
+    margin-bottom: 40px;
+}
+.body-home .head .mc .search-con{
+    position: relative;
+    border: 1px solid #fff;
+    width: 560px;
+    height: 38px;
+    margin: 0 auto;
+    text-align: left;
+    overflow: hidden;
+}
+.body-home .head .mc .search-con .select-search{
+    position: relative;
+    width: 86px;
+    height: 34px;
+    float: left;
+    margin-top: 1px;
+    border-right: 1px solid #fff;
+}
+.body-home .head .mc .search-con span{
+    display: block;
+    width: 61px;
+    height: 100%;
+    line-height: 34px;
+    margin-left: 15px;
+    background: url("../images/select-ar2.png") no-repeat right center;
+}
+.body-home .head .mc .search-con select{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 86px;
+    height: 34px;
+    opacity: 0;
+    cursor: pointer;
+}
+.body-home .head .mc .search-con .input{
+    float: left;
+    width: 405px;
+    height: 36px;
+    background: none;
+    border: 0;
+    color: #fff;
+    margin-left: 10px;
+}
+.body-home .head .mc .search-con .input::-webkit-input-placeholder {
+    color: #fff;
+}
+.body-home .head .mc .search-con .input:-moz-placeholder {
+    color: #fff;
+}
+.body-home .head .mc .search-con .input::-moz-placeholder {
+    color: #fff;
+}
+.body-home .head .mc .search-con .input:-ms-input-placeholder {
+    color: #fff;
+}
+.body-home .head .mc .search-con .btn-submit{
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 55px;
+    height: 36px;
+    border: 0;
+    background: url("../images/icon-search.png") no-repeat center;
+}
+.body-home .head .mc .search-hot{
+    margin-top: 12px;
+}
+.home-recommend{
+    -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box;
+    margin: 0 auto;
+    max-width: 1200px;
+    min-width: 1000px;
+    position: relative;
+}
+.home-recommend h2{
+    margin: 20px 0 32px;
+    font-size: 16px;
+    text-align: center;
+    font-weight: normal;
+    color: #999;
+    border-bottom: 1px solid #d7d7d7;
+    height: 36px;
+}
+.home-recommend h2 span{
+    height: 100%;
+    padding: 0 30px;
+    background: #fff;
+    display: inline-block;
+    position: relative;
+    top: 22px;
+}
+.home-recommend .list{
+    overflow: hidden;
+}
+.home-recommend .list-inner{
+    width: 101%;
+}
+.home-recommend .list .pic img{
+    width: 100%;
+}
+.home-recommend .list .box{
+    float: left;
+    width: 33%;
+    color: #fff;
+    margin-bottom: 1px;
+    margin-right: 1px;
+    position: relative;
+}
+.home-recommend .list .b-p{
+    overflow: hidden;
+}
+.home-recommend .list .b-c:after{
+    content: '';
+    position: absolute;
+    top: 50%;
+    margin-top: -12px;
+    width: 15px;
+    height: 25px;
+    z-index: 2;
+}
+.home-recommend .list .c1:after{
+    left: -15px;
+    background: url("../images/recommend-c1-ar.png") no-repeat right center;
+}
+.home-recommend .list .c3:after{
+    right: -15px;
+    background: url("../images/recommend-c3-ar.png") no-repeat left center;
+}
+.home-recommend .list .c2:after{
+    top: -15px;
+    margin-top: 0;
+    left: 50%;
+    margin-left: -12px;
+    background: url("../images/recommend-c2-ar.png") no-repeat center bottom;
+    width: 25px;
+    height: 15px;
+}
+.home-recommend .list.loaded .c1{
+    background-color: #14b9f8;
+}
+.home-recommend .list.loaded .c2{
+    background-color: #8cc64e;
+}
+.home-recommend .list.loaded .c3{
+    background-color: #e4b416;
+}
+.home-recommend .list .con{
+    display: table;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+.home-recommend .list .con-inner{
+    display: table-cell;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+}
+.home-recommend .list .con .tit{
+    font-size: 24px;
+    margin-left: 27px;
+}
+.home-recommend .list .con .name{
+    font-size: 24px;
+    margin-left: 27px;
+    margin-bottom: 5%;
+}
+.home-recommend .list .con .desc{
+    margin-left: 27px;
+    margin-bottom: 6%;
+}
+.home-recommend .list .con .desc li{
+    margin-bottom: 3px;
+}
+.home-recommend .list .con .amount{
+    margin-left: 27px;
+}
+.home-recommend .list .con .amount .name-a{
+    font-size: 22px;
+    display: block;
+}
+.home-recommend .list .con .amount .nums{
+    font-size: 30px;
+    margin-left: -5px;
+}
+.home-recommend .list .con .like{
+    position: absolute;
+    right: 25px;
+    bottom: 15px;
+    font-size: 20px;
+    padding-left: 40px;
+    background: url("../images/icon-like.png") no-repeat left top;
+    padding-top: 3px;
+}

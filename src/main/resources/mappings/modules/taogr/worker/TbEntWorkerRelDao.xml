@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.thinkgem.jeesite.modules.taogr.dao.worker.TbEntWorkerRelDao">
+
+	<sql id="tbEntWorkerRelColumns">
+		a.id AS "id",
+		a.ent_id AS "entId",
+		a.worker_id AS "worker.id",
+		d.prof_ty_cd AS "profTyCd.id",
+		g.insurance_tp_cd AS "insuranceTpCd",
+		a. STATUS AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.worker_code AS "worker.workerCode",
+		b.py AS "worker.py",
+		b.name_once AS "worker.nameOnce",
+		b.is_active AS "worker.isActive",
+		b.id_no AS "worker.idNo",
+		b.address AS "worker.address",
+		b.phone_number AS "worker.phoneNumber", 
+		b.jg AS "worker.jg",
+		b.now_address AS "worker.nowAddress",
+		GROUP_CONCAT(DISTINCT ab_name SEPARATOR ',') AS "profTyCd.abName",
+		d.del_flag AS "tbWorkerAbility.delFlag",
+		GROUP_CONCAT(DISTINCT ins_name SEPARATOR ',') AS "insuranceTpCd.insName",
+		b.sex AS "worker.sex",
+		te.name AS "office.name",
+		g.dt_audit AS "tbInsuranceList.dtAudit",
+		g.dt_quit_insurance AS "tbInsuranceList.dtQuitInsurance",
+	    g.in_quit  AS "tbInsuranceList.inQuit",
+		g.id AS "tbInsuranceList.id"
+
+	</sql>
+
+	<sql id="tbEntWorkerRelJoins">
+		left join tb_worker_info b on a.worker_id = b.id
+		left join tb_worker_ability d on d.worker_id=b.id
+		left join tb_ability c on c.id = d.prof_ty_cd
+		LEFT JOIN tb_insurance_list g ON g.id_no = b.id_no
+		LEFT JOIN td_insurance_type f ON f.id = g.insurance_tp_cd
+		left join sys_office te on a.ent_id = te.id
+	</sql>
+
+	<select id="get" resultType="TbEntWorkerRel">
+		SELECT
+		<include refid="tbEntWorkerRelColumns" />
+		FROM tb_ent_worker_rel a
+		<include refid="tbEntWorkerRelJoins" />
+		WHERE a.id = #{id} AND  d.del_flag = '0'
+	</select>
+
+	<select id="findList" resultType="TbEntWorkerRel">
+		SELECT
+		<include refid="tbEntWorkerRelColumns" />
+		FROM tb_ent_worker_rel a
+		<include refid="tbEntWorkerRelJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.ent_id = #{office.id}
+			</if>
+			<if test="office != null and office.name != null and office.name != ''">
+				AND te.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{office.name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{office.name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{office.name},'%')</if>
+			</if>
+			<if test="worker != null and worker.id != null and worker.id != ''">
+				AND a.worker_id = #{worker.id}
+			</if>
+			<if test="worker != null and worker.sex!= null and worker.sex != ''">
+				AND b.sex = #{worker.sex}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="profTyCd != null and profTyCd.abName != null and profTyCd.abName != ''">
+			    AND c.ab_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{profTyCd.abName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{profTyCd.abName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{profTyCd.abName},'%')</if>
+			</if>
+			<if test="worker != null and worker.idNo != null and worker.idNo != ''">
+				AND b.id_no LIKE
+				<if test="dbName == 'oracle'">'%'||#{worker.idNo}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{worker.idNo}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{worker.idNo},'%')</if>
+			</if>
+			<if
+				test="worker != null and worker.workerCode != null and worker.workerCode != ''">
+				AND b.worker_code LIKE
+				<if test="dbName == 'oracle'">'%'||#{worker.workerCode}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{worker.workerCode}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{worker.workerCode},'%')</if>
+			</if>
+
+			GROUP BY a.worker_id
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+
+			</otherwise>
+		</choose>
+	</select>
+
+	<select id="findAllList" resultType="TbEntWorkerRel">
+		SELECT
+		<include refid="tbEntWorkerRelColumns" />
+		FROM tb_ent_worker_rel a
+		<include refid="tbEntWorkerRelJoins" />
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+
+	<insert id="insert">
+		INSERT INTO tb_ent_worker_rel(
+		id,
+		ent_id,
+		worker_id,
+		status,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		remarks,
+		del_flag
+		) VALUES (
+		#{id},
+		#{entId},
+		#{worker.id},
+		#{status},
+		#{createBy.id},
+		#{createDate},
+		#{updateBy.id},
+		#{updateDate},
+		#{remarks},
+		#{delFlag}
+		)
+	</insert>
+
+	<update id="update">
+		UPDATE tb_ent_worker_rel SET
+		ent_id = #{entId},
+		worker_id = #{worker.id},
+		status = #{status},
+		update_by = #{updateBy.id},
+		update_date = #{updateDate},
+		remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+
+	<update id="delete">
+		UPDATE tb_ent_worker_rel SET
+		del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+	<update id="updateStatus" parameterType="TbEntWorkerRel">
+		UPDATE tb_ent_worker_rel
+		SET
+		status = #{status}
+		WHERE id = #{id}
+	</update>
+
+	<select id="findListForBuy" resultType="TbEntWorkerRel"
+		parameterType="TbEntWorkerRel">
+		SELECT
+		a.id AS "id",
+		a.ent_id AS "entId",
+		a.worker_id AS "worker.id",
+		d.prof_ty_cd AS "profTyCd.id",
+
+		a.status AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.worker_code AS "worker.workerCode",
+		b.py AS "worker.py",
+		b.name_once AS "worker.nameOnce",
+		b.is_active AS "worker.isActive",
+		b.id_no AS "worker.idNo",
+		b.address AS "worker.address",
+		b.phone_number AS "worker.phoneNumber",
+		b.jg AS "worker.jg",
+		b.now_address AS "worker.nowAddress"
+
+		FROM tb_ent_worker_rel a
+		LEFT JOIN tb_worker_info b ON a.worker_id = b.id
+		LEFT JOIN tb_worker_ability d ON d.worker_id = b.id
+		LEFT JOIN tb_ability c ON c.id = d.prof_ty_cd
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.worker_id in
+			<foreach collection="strList" item="workid" index="index"
+				open="(" close=")" separator=",">
+				#{workid} 
+			</foreach>
+		</where>
+		GROUP BY a.worker_id
+	</select>
+<!-- 	<select id="findListForQuit" resultType="TbEntWorkerRel"
+		parameterType="TbEntWorkerRel">
+	SELECT
+		a.id AS "id",
+		a.ent_id AS "office.id",
+		a.worker_id AS "worker.id",
+		d.prof_ty_cd AS "profTyCd.id",
+
+		a. STATUS AS "status",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		b.worker_code AS "worker.workerCode",
+		b.py AS "worker.py",
+		b.name_once AS "worker.nameOnce",
+		b.is_active AS "worker.isActive",
+		b.id_no AS "worker.idNo",
+		b.address AS "worker.address",
+		b.phone_number AS "worker.phoneNumber",
+		b.jg AS "worker.jg",
+		b.now_address AS "worker.nowAddress"
+        
+		FROM tb_ent_worker_rel a
+		LEFT JOIN tb_worker_info b ON a.worker_id = b.id
+		LEFT JOIN tb_worker_ability d ON d.worker_id = b.id
+		LEFT JOIN tb_ability c ON c.id = d.prof_ty_cd
+
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.ent_id = #{entId}
+			AND a.worker_id in
+			<foreach collection="strList" item="workid" index="index"
+				open="(" close=")" separator=",">
+				#{workid} 
+			</foreach>
+		</where>
+		GROUP BY a.worker_id
+		</select> -->
+</mapper>

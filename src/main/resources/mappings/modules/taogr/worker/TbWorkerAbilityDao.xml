@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.worker.TbWorkerAbilityDao">
+    
+	<sql id="tbWorkerAbilityColumns">
+		a.id AS "id",
+		a.worker_id AS "worker.id",
+		a.prof_ty_cd AS "profTyCd.id",
+		a.is_auth AS "isAuth",
+		a.auth_no AS "authNo",
+		a.auth_image AS "authImage",
+		a.is_active AS "isActive",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag" ,
+		b.ab_name as "profTyCd.abName"
+	</sql>
+	
+	<sql id="tbWorkerAbilityJoins">
+	left join tb_ability b on a.prof_ty_cd = b.id
+	</sql>
+    
+	<select id="get" resultType="TbWorkerAbility">
+		SELECT 
+			<include refid="tbWorkerAbilityColumns"/>
+		FROM tb_worker_ability a
+		<include refid="tbWorkerAbilityJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbWorkerAbility">
+		SELECT 
+			<include refid="tbWorkerAbilityColumns"/>
+		FROM tb_worker_ability a
+		<include refid="tbWorkerAbilityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="worker != null and worker.id != null and worker.id != ''">
+				AND a.worker_id = #{worker.id}
+			</if>
+			<if test="isAuth != null and isAuth != ''">
+				AND a.is_auth = #{isAuth}
+			</if>
+			<if test="authNo != null and authNo != ''">
+				AND a.auth_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{authNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{authNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{authNo},'%')</if>
+			</if>
+			<if test="isActive != null and isActive != ''">
+				AND a.is_active = #{isActive}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbWorkerAbility">
+		SELECT 
+			<include refid="tbWorkerAbilityColumns"/>
+		FROM tb_worker_ability a
+		<include refid="tbWorkerAbilityJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_worker_ability(
+			id,
+			worker_id,
+			prof_ty_cd,
+			is_auth,
+			auth_no,
+			auth_image,
+			is_active,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{worker.id},
+			#{profTyCd.id},
+			#{isAuth},
+			#{authNo},
+			#{authImage},
+			#{isActive},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_worker_ability SET 	
+			worker_id = #{worker.id},
+			prof_ty_cd = #{profTyCd.id},
+			is_auth = #{isAuth},
+			auth_no = #{authNo},
+			auth_image = #{authImage},
+			is_active = #{isActive},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_worker_ability SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

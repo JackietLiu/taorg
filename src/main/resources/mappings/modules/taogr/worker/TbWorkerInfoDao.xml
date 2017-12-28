@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taogr.dao.worker.TbWorkerInfoDao">
+    
+	<sql id="tbWorkerInfoColumns">
+	    a.id AS "id",
+		a.worker_code AS "workerCode",
+		a.py AS "py",
+		a.name_once AS "nameOnce",
+		a.is_active AS "isActive",
+		a.id_no AS "idNo",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		a.address AS "address",
+		a.jg AS "jg",
+		a.now_address AS "nowAddress",
+		a.worker_image AS "workerImage",
+		a.phone_number AS "phoneNumber",
+		a.sex AS "sex", 
+		d.prof_ty_cd AS "profTyCd.id",
+		g.insurance_tp_cd AS "insuranceTpCd",
+		b. STATUS AS "tbEntWorkerRel.status",
+		b.remarks AS "tbEntWorkerRel.remarks",
+		b.del_flag AS "tbEntWorkerRel.delFlag",
+		GROUP_CONCAT(DISTINCT ab_name SEPARATOR ',') AS "profTyCd.abName",
+		d.del_flag AS "tbWorkerAbility.delFlag",
+		GROUP_CONCAT(DISTINCT ins_name SEPARATOR ',') AS "insuranceTpCd.insName",
+		te.name AS "office.name",
+		g.dt_audit AS "tbInsuranceList.dtAudit",
+		g.dt_quit_insurance AS "tbInsuranceList.dtQuitInsurance",
+	    g.in_quit  AS "tbInsuranceList.inQuit",
+		g.id AS "tbInsuranceList.id",
+		a.ent_id AS "office.id"
+		
+		
+		
+	</sql>
+	
+	<sql id="tbWorkerInfoJoins">
+    	left join tb_ent_worker_rel b on b.worker_id = a.id
+		left join tb_worker_ability d on d.worker_id=a.id
+		left join tb_ability c on c.id = d.prof_ty_cd
+		LEFT JOIN tb_insurance_list g ON g.id_no = a.id_no
+		LEFT JOIN td_insurance_type f ON f.id = g.insurance_tp_cd
+		left join sys_office te on a.ent_id = te.id
+		
+		
+	</sql>
+    
+	<select id="get" resultType="TbWorkerInfo">
+		SELECT 
+			<include refid="tbWorkerInfoColumns"/>
+		FROM tb_worker_info a
+		<include refid="tbWorkerInfoJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbWorkerInfo">
+		SELECT 
+			<include refid="tbWorkerInfoColumns"/>
+		FROM tb_worker_info a
+		<include refid="tbWorkerInfoJoins"/>
+		<where>
+<!-- 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="workerCode != null and workerCode != ''">
+				AND a.worker_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{workerCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{workerCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{workerCode},'%')</if>
+			</if>
+			<if test="py != null and py != ''">
+				AND a.py LIKE 
+					<if test="dbName == 'oracle'">'%'||#{py}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{py}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{py},'%')</if>
+			</if>
+			<if test="nameOnce != null and nameOnce != ''">
+				AND a.name_once LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nameOnce}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nameOnce}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nameOnce},'%')</if>
+			</if>
+			<if test="isActive != null and isActive != ''">
+				AND a.is_active = #{isActive}
+			</if>
+			<if test="idNo != null and idNo != ''">
+				AND a.id_no LIKE 
+					<if test="dbName == 'oracle'">'%'||#{idNo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{idNo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{idNo},'%')</if>
+			</if> -->
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.ent_id = #{office.id}
+			</if>
+			<if test="office != null and office.name != null and office.name != ''">
+				AND te.name LIKE
+				<if test="dbName == 'oracle'">'%'||#{office.name}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{office.name}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{office.name},'%')</if>
+			</if>
+			<if test="sex!= null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="tbEntWorkerRel != null and tbEntWorkerRel.status != null and tbEntWorkerRel.status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="idNo != null and idNo != ''">
+				AND a.id_no LIKE
+				<if test="dbName == 'oracle'">'%'||#{idNo}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{idNo}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{idNo},'%')</if>
+			</if>
+			<if
+				test=" workerCode != null and workerCode != ''">
+				AND a.worker_code LIKE
+				<if test="dbName == 'oracle'">'%'||#{workerCode}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{workerCode}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{workerCode},'%')</if>
+			</if>
+
+			GROUP BY a.id
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbWorkerInfo">
+		SELECT 
+			<include refid="tbWorkerInfoColumns"/>
+		FROM tb_worker_info a
+		<include refid="tbWorkerInfoJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_worker_info(
+			id,
+			worker_code,
+			py,
+			name_once,
+			is_active,
+			id_no,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			address,
+			jg,
+			now_address,
+			worker_image,
+			phone_number,
+			sex,
+			ent_id
+		) VALUES (
+			#{id},
+			#{workerCode},
+			#{py},
+			#{nameOnce},
+			#{isActive},
+			#{idNo},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			#{address},
+			#{jg},
+			#{nowAddress},
+			#{workerImage},
+			#{phoneNumber},
+			#{sex},
+			#{office.id}
+			)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_worker_info SET 	
+			worker_code = #{workerCode},
+			py = #{py},
+			name_once = #{nameOnce},
+			is_active = #{isActive},
+			id_no = #{idNo},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			address = #{address},
+			jg = #{jg},
+			now_address = #{nowAddress},
+			worker_image = #{workerImage},
+			phone_number = #{phoneNumber},
+			sex = #{sex},
+			ent_id = #{office.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_worker_info SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	<select id="findWorkerByOther" resultType="TbWorkerInfo" parameterType="TbWorkerInfo">
+		SELECT 
+			<include refid="tbWorkerInfoColumns"/>
+		FROM tb_worker_info a
+		<include refid="tbWorkerInfoJoins"/>
+		<where>
+			a.del_flag = 0
+			<if test="workerCode != null and workerCode != ''">
+				AND a.worker_code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{workerCode}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{workerCode}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{workerCode},'%')</if>
+			</if>
+			<if test="py != null and py != ''">
+				AND a.py LIKE 
+					<if test="dbName == 'oracle'">'%'||#{py}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{py}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{py},'%')</if>
+			</if>
+			<if test="nameOnce != null and nameOnce != ''">
+				AND a.name_once LIKE 
+					<if test="dbName == 'oracle'">'%'||#{nameOnce}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{nameOnce}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{nameOnce},'%')</if>
+			</if>
+			<if test="isActive != null and isActive != ''">
+				AND a.is_active = #{isActive}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="idNo != null and idNo != ''">
+				AND a.id_no =  #{idNo}
+			</if>
+		</where>
+	</select>
+</mapper>

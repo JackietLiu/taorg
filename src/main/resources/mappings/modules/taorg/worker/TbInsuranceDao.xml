@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taorg.dao.worker.TbInsuranceDao">
+    
+	<sql id="tbInsuranceListColumns">
+		a.id AS "id",
+		a.ent_id AS "office.id",
+		a.worker_name AS "workerName",
+		a.id_no AS "idNo",
+		a.insurance_tp_cd AS "insuranceTp.id",
+		a.fee_per AS "feePer",
+		a.dt_start AS "dtStart",
+		a.dt_end AS "dtEnd",
+		a.user_audit AS "userAudit.id",
+		a.dt_audit AS "dtAudit",
+		a.status_audit AS "statusAudit",
+		a.in_quit AS "inQuit",
+		a.dt_quit_insurance AS "dtQuitInsurance",
+		a.user_create_quit AS "userCreateQuit.id",
+		a.dt_quit_create AS "dtQuitCreate",
+		a.user_audit_quit AS "userAuditQuit.id",
+		a.dt_audit_quit AS "dtAuditQuit",
+		a.status_audit_quit AS "statusAuditQuit",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag" ,
+		b.name AS "office.name",
+	    c.ins_name as "insuranceTp.insName",
+	    a.end_flag AS "endFlag"
+	
+	</sql>
+	
+	<sql id="tbInsuranceListJoins">
+	left join sys_office b on a.ent_id = b.id
+	left join td_insurance_type c on a.insurance_tp_cd = c.id
+	</sql>
+    
+	<select id="get" resultType="TbInsuranceList">
+		SELECT 
+			<include refid="tbInsuranceListColumns"/>
+		FROM tb_insurance_list a
+		<include refid="tbInsuranceListJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbInsuranceList">
+		SELECT 
+			<include refid="tbInsuranceListColumns"/>
+		FROM tb_insurance_list a
+		<include refid="tbInsuranceListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="office != null and office.id != null and office.id != ''">
+				AND a.ent_id = #{ent.id}
+			</if>
+			<if test="office != null and office.name != null and office.name != ''">
+				AND b.name  LIKE 
+					<if test="dbName == 'oracle'">'%'|| #{office.name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+# #{office.name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%', #{office.name},'%')</if>
+			</if>
+			<if test="workerName != null and workerName != ''">
+				AND a.worker_name = #{workerName}
+			</if>
+			<if test="idNo != null and idNo != ''">
+				AND a.id_no = #{idNo}
+			</if>
+			<if test="insuranceTp != null and insuranceTp.id != null and insuranceTp.id != ''">
+				AND a.insurance_tp_cd = #{insuranceTp.id}
+			</if>
+			<if test="statusAudit != null and statusAudit != ''">
+				AND a.status_audit = #{statusAudit}
+			</if>
+			<if test="inQuit != null and inQuit != ''">
+				AND a.in_quit = #{inQuit}
+			</if>
+			<if test="statusAuditQuit != null and statusAuditQuit != ''">
+				AND a.status_audit_quit = #{statusAuditQuit}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TbInsuranceList">
+		SELECT 
+			<include refid="tbInsuranceListColumns"/>
+		FROM tb_insurance_list a
+		<include refid="tbInsuranceListJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_insurance_list(
+			id,
+			ent_id,
+			worker_name,
+			id_no,
+			insurance_tp_cd,
+			fee_per,
+			dt_start,
+			dt_end,
+			user_audit,
+			dt_audit,
+			status_audit,
+			in_quit,
+			dt_quit_insurance,
+			user_create_quit,
+			dt_quit_create,
+			user_audit_quit,
+			dt_audit_quit,
+			status_audit_quit,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag,
+			end_flag
+		) VALUES (
+			#{id},
+			#{ent.id},
+			#{workerName},
+			#{idNo},
+			#{insuranceTp.id},
+			#{feePer},
+			#{dtStart},
+			#{dtEnd},
+			#{userAudit},
+			#{dtAudit},
+			#{statusAudit},
+			#{inQuit},
+			#{dtQuitInsurance},
+			#{userCreateQuit},
+			#{dtQuitCreate},
+			#{userAuditQuit},
+			#{dtAuditQuit},
+			#{statusAuditQuit},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag},
+			CASE WHEN DATEDIFF(dt_end,NOW()) = 1 THEN '1'  WHEN DATEDIFF(dt_end,dt_start) = 1 AND dt_end >= NOW() THEN '1'  WHEN DATEDIFF(dt_end,NOW()) > 1 THEN '0'  ELSE '2' END
+			
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_insurance_list SET 	
+			ent_id = #{ent.id},
+			worker_name = #{workerName},
+			id_no = #{idNo},
+			insurance_tp_cd = #{insuranceTp.id},
+			fee_per = #{feePer},
+			dt_start = #{dtStart},
+			dt_end = #{dtEnd},
+			user_audit = #{userAudit},
+			dt_audit = #{dtAudit},
+			status_audit = #{statusAudit},
+			in_quit = #{inQuit},
+			dt_quit_insurance = #{dtQuitInsurance},
+			user_create_quit = #{userCreateQuit},
+			dt_quit_create = #{dtQuitCreate},
+			user_audit_quit = #{userAuditQuit},
+			dt_audit_quit = #{dtAuditQuit},
+			status_audit_quit = #{statusAuditQuit},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			end_flag = CASE WHEN DATEDIFF(dt_end,NOW()) = 1 THEN '1'  WHEN DATEDIFF(dt_end,dt_start) = 1 AND dt_end >= NOW() THEN '1'  WHEN DATEDIFF(dt_end,NOW()) > 1 THEN '0'  ELSE '2' END
+			
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_insurance_list SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

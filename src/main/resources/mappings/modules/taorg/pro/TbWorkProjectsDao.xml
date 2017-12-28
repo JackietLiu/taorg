@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.taorg.dao.pro.TbWorkProjectsDao">
+    
+	<sql id="tbWorkProjectsColumns">
+		a.id AS "id",
+		a.pro_name AS "proName",
+		a.address AS "address",
+		a.principal AS "principal",
+		a.manager AS "manager",
+		a.del_flag AS "delFlag",
+		a.remark AS "remark",
+		a.ent_id AS "office.id",
+		a.parent_id AS "parent.id",
+		a.parent_ids AS "parentIds",	
+		b.name AS "office.name",
+		a.type AS "type",
+		a.team_id AS "workerTeam.id",
+		c.team_name AS "workerTeam.teamName"
+	</sql>
+	
+	<sql id="tbWorkProjectsJoins">
+	LEFT JOIN sys_office b ON b.id=a.ent_id
+	LEFT JOIN tb_worker_team c ON c.id=a.team_id
+	</sql>
+    
+	<select id="get" resultType="TbWorkProjects">
+		SELECT 
+			<include refid="tbWorkProjectsColumns"/>
+		FROM tb_work_projects a
+		<include refid="tbWorkProjectsJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TbWorkProjects">
+		SELECT 
+			<include refid="tbWorkProjectsColumns"/>
+		FROM tb_work_projects a
+		<include refid="tbWorkProjectsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="proName != null and proName != ''">
+				AND a.pro_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{proName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{proName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{proName},'%')</if>
+			</if>
+			<if test="address != null and address != ''">
+				AND a.address LIKE 
+					<if test="dbName == 'oracle'">'%'||#{address}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{address}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{address},'%')</if>
+			</if>
+			<if test="principal != null and principal != ''">
+				AND a.principal LIKE 
+					<if test="dbName == 'oracle'">'%'||#{principal}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{principal}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{principal},'%')</if>
+			</if>
+			<if test="manager != null and manager != ''">
+				AND a.manager LIKE 
+					<if test="dbName == 'oracle'">'%'||#{manager}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{manager}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{manager},'%')</if>
+			</if>
+			<if test="parent != null and parent.id != null and parent.id != ''">
+				AND a.parent_id = #{parent.id}
+			</if>
+			<if test="parentIds != null and parentIds != ''">
+				AND a.parent_ids LIKE 
+					<if test="dbName == 'oracle'">'%'||#{parentIds}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{parentIds}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{parentIds},'%')</if>
+			</if>
+
+		</where>
+	</select>
+	<select id="findProByEntId" resultType="TbWorkProjects" useCache="true">
+	SELECT
+			a.id, a.proName
+		FROM tb_work_projects a
+		WHERE a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.ent_id = #{office.id}
+		ORDER BY a.proName
+	</select>
+	<select id="findAllList" resultType="TbWorkProjects">
+		SELECT 
+			<include refid="tbWorkProjectsColumns"/>
+		FROM tb_work_projects a
+		<include refid="tbWorkProjectsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+	</select>
+	
+	<select id="findByParentIdsLike" resultType="TbWorkProjects">
+		SELECT
+			a.id,
+			a.parent_id AS "parent.id",
+			a.parent_ids
+		FROM tb_work_projects a
+		<include refid="tbWorkProjectsJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			AND a.parent_ids LIKE #{parentIds}
+		</where>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_work_projects(
+			id,
+			pro_name,
+			address,
+			principal,
+			manager,
+			del_flag,
+			remark,
+			ent_id,
+			parent_id,
+			parent_ids,
+			type,
+			team_id
+		) VALUES (
+			#{id},
+			#{proName},
+			#{address},
+			#{principal},
+			#{manager},
+			#{delFlag},
+			#{remark},
+			#{office.id},
+			#{parent.id},
+			#{parentIds},		
+			#{type},
+			#{workerTeam.id}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_work_projects SET 	
+			pro_name = #{proName},
+			address = #{address},
+			principal = #{principal},
+			manager = #{manager},
+			remark = #{remark},
+			ent_id = #{office.id},
+			parent_id = #{parent.id},
+			parent_ids = #{parentIds},
+			type = #{type},
+			team_id = #{workerTeam.id}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="updateParentIds">
+		UPDATE tb_work_projects SET 
+			parent_id = #{parent.id}, 
+			parent_ids = #{parentIds}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE tb_work_projects SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id} OR parent_ids LIKE  <if test="dbName == 'oracle'">'%'||#{id}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{id}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{id},'%')</if>
+	</update> 
+	
+</mapper>
